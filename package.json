@@ -1,0 +1,22 @@
+{
+  "name": "serverless-chime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "browserify public/client.js -o public/bundle.js && node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amazon-chime-sdk-js": "^2.4.0",
+    "aws-sdk": "^2.828.0",
+    "body-parser": "^1.19.0",
+    "browserify": "^17.0.0",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
+    "pug": "^3.0.0",
+    "uuid": "^8.3.2"
+  }
+}
