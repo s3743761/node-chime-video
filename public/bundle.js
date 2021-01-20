@@ -29292,115 +29292,14 @@ BufferWriter.prototype.string = function write_string_buffer(value) {
 })(typeof window === 'object' ? window : this);
 
 },{}],202:[function(require,module,exports){
-// import {
-//     ConsoleLogger,
-//     DefaultDeviceController,
-//     DefaultMeetingSession,
-//     LogLevel,
-//     MeetingSessionConfiguration
-// } from 'amazon-chime-sdk-js';
+
 const aws = require('amazon-chime-sdk-js');
+
 
 const logger = new aws.ConsoleLogger('MyLogger', aws.LogLevel.INFO);
 const deviceController = new aws.DefaultDeviceController(logger);
-
-
-// You need responses from server-side Chime API. See below for details.
-// const meetingResponse = meetingResponse;
-// const attendeeResponse = attendeeResponse;
-// const configuration = new MeetingSessionConfiguration(meetingResponse, attendeeResponse);
-
-// // In the usage examples below, you will use this meetingSession object.
-// const meetingSession = new DefaultMeetingSession(
-//   configuration,
-//   logger,
-//   deviceController
-// );
-
-// document.getElementById('submit').onclick = function(e){
-//     e.preventDefault();
-
-    // const meeting_name = document.getElementById("meeting-name").value;
-
-    // fetch('/meeting',{
-    //     method:'POST', 
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({meeting_name: meeting_name})
-    // }).then(response => response.json())
-//     .then(data => {
-//         // console.log(data)
-        // const meetingResponse = data.meetingResponse;
-        // const attendeeResponse = data.attendee;
-        // const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
-
-        // // In the usage examples below, you will use this meetingSession object.
-        // const meetingSession = new aws.DefaultMeetingSession(
-        //     configuration,
-        //     logger,
-        //     deviceController
-        // );
-//         console.log(meetingSession)
-//         const audioElement = document.getElementById('audio-element');
-//         const videoElement = document.getElementById('video-element');
-        
-
-//         const observer = {
-//             audioVideoDidStart: () => {
-//                 console.log('Started');
-//                 meetingSession.audioVideo.startLocalVideoTile();
-//             },
-//             videoTileDidUpdate: tileState => {
-//                 // Ignore a tile without attendee ID and other attendee's tile.
-//                 // if (!tileState.boundAttendeeId || !tileState.localTile) {
-//                 //     console.log("ignore")
-//                 //     return;
-//                 // }
-            
-//                 meetingSession.audioVideo.bindVideoElement(tileState.tileId, videoElement);
-//             }
-//         };
-
-//         // meetingSession.audioVideo.addObserver(observer);
-
-//         // meetingSession.audioVideo.listVideoInputDevices()
-//         //     .then(devices => {
-//         //         let firstVideoDeviceId = devices[0].deviceId;
-//         //         meetingSession.audioVideo.chooseVideoInputDevice(firstVideoDeviceId);
-
-//         //         meetingSession.audioVideo.listAudioInputDevices()
-//         //         .then(audioDevices => {
-//         //             meetingSession.audioVideo.chooseAudioInputDevice(audioDevices[0].deviceId);
-//         //             meetingSession.audioVideo.bindAudioElement(audioElement);
-//         //             meetingSession.audioVideo.start();
-
-//         //             meetingSession.audioVideo.listAudioOutputDevices()
-//         //             .then(audioOutputDevices => {
-//         //                 console.log("output devices:", audioOutputDevices);
-//         //             });
-//         //         });
-//         //     });
-        
-        
-//         // meetingSession.audioVideo.listAudioOutputDevices()
-//         //     .then(devices => {
-//         //         console.log("output devices:", devices);
-//         //     });
-        
-//         // meetingSession.audioVideo.listAudioInputDevices()
-//         //     .then(r => {
-
-//         //     });
-
-//         // meetingSession.audioVideo.listAudioOutputDevices()
-//         //     .then(r => console.log("output:", r));
-        
-
-        
-//     })
-
-// }
+// let configuration
+// let meetingSession
 document.getElementById('submit').addEventListener('click', onClick);
 
 async function onClick(event) {
@@ -29419,9 +29318,16 @@ async function onClick(event) {
     const data = await response.json();
     const meetingResponse = data.meetingResponse;
     const attendeeResponse = data.attendee;
-    const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
+    // configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
 
+    const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
     // In the usage examples below, you will use this meetingSession object.
+    // meetingSession = new aws.DefaultMeetingSession(
+    //     configuration,
+    //     logger,
+    //     deviceController
+    // );
+
     const meetingSession = new aws.DefaultMeetingSession(
         configuration,
         logger,
@@ -29451,16 +29357,6 @@ async function onClick(event) {
             console.log('Started');
         },
         videoTileDidUpdate: tileState => {
-            // Ignore a tile without attendee ID and other attendee's tile.
-            // if (!tileState.boundAttendeeId || !tileState.localTile || tileState.isContent) {
-            //   return;
-            // }
-            // if (!tileState.boundAttendeeId || tileState.localTile || tileState.isContent) {
-            //     return;
-            // }
-            // // if (!tileState.boundAttendeeId || !tileState.localTile){
-            //     meetingSession.audioVideo.bindVideoElement(tileState.tileId, remoteVideoElement);
-            // // }
             let videoElement = document.getElementById("video-" + tileState.tileId);
             if (!videoElement) {
                 videoElement = document.createElement("video");
@@ -29484,5 +29380,129 @@ async function onClick(event) {
 
 }
 
+/*
+wait 10 seconds js
+get local vide element using document.querySelectorAll('[data-foo="value"]');
+screenshot of element html js
 
+*/
+
+
+// var scaleFactor = 0.25;
+
+
+function capture(video, scaleFactor) {
+    if (scaleFactor == null) {
+        scaleFactor = 1;
+    }
+    var w = video.videoWidth * scaleFactor;
+    var h = video.videoHeight * scaleFactor;
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, w, h);
+    return canvas;
+}
+
+
+
+document.getElementById('screenshot').addEventListener('click', onClickScreenShot);
+async function onClickScreenShot(event) {
+    let snapshots = [];
+    event.preventDefault();
+   
+    let video =  document.querySelectorAll('[is-local="true"]')[0];
+    let canvas = capture(video, 0.25);
+
+    let screenshot = canvas.toDataURL('image/png');
+    // console.log(screenshot);
+
+    const response = await fetch('/facial',{
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({emotions: screenshot})
+    });
+    const data = await response.json();
+    // console.log(data)
+    snapshots.push(data)
+    console.log(snapshots[0][0]['Type'])
+    // console.log(configuration)
+
+    // SEND TO AWS REKO
+
+    // canvas.onClickScreenShot = function() {
+    //     window.open(this.toDataURL(image/jpg));
+        
+    //     console.log("image out",this.toDataURL(image/jpg));
+    // };
+    
+    // snapshots.push(canvas);
+    // output.innerHTML = '';
+    // // for (var i = 0; i < 4; i++) {
+    // //     output.append(snapshots[i]);
+    // // }
+    // snapshots.forEach(element => output.appendChild(element));
+
+}
+
+// // setInterval(onClickScreenShot,5000)//Runs the "func" function every second
+// document.getElementById('stop').addEventListener('click', stopCall);
+// async function stopCall(event) {
+//     event.preventDefault();
+
+//     const observer = {
+//         audioVideoDidStop: sessionStatus => {
+//           const sessionStatusCode = sessionStatus.statusCode();
+//           if (sessionStatusCode === configuration.Left) {
+//             /*
+//               - You called meetingSession.audioVideo.stop().
+//               - When closing a browser window or page, Chime SDK attempts to leave the session.
+//             */
+//             console.log('You left the session');
+//           } else {
+//             console.log('Stopped with a session status code: ', sessionStatusCode);
+//           }
+//         }
+//       };
+      
+//     meetingSession.audioVideo.addObserver(observer);
+    
+//     meetingSession.audioVideo.stop();
+// }
+var ctx = document.getElementById('myChart').getContext('2d');
+var dataFirst = {
+    label: "Car A - Speed (mph)",
+    data: [0, 59, 75, 20, 20, 55, 40],
+    lineTension: 0.3,
+    // Set More Options
+    borderColor: 'red'
+};
+     
+var dataSecond = {
+label: "Car B - Speed (mph)",
+data: [20, 15, 60, 60, 65, 30, 70],
+// Set More Options
+borderColor: 'black'
+};
+
+var thirdSecond = {
+    label: "Car C - Speed (mph)",
+    data: [0,10,25,74,64,65,80],
+    // Set More Options
+    borderColor: 'green'
+};
+    
+var speedData = {
+labels: ["0s", "10s", "20s", "30s", "40s", "50s", "60s"],
+datasets: [dataFirst, dataSecond,thirdSecond]
+};
+   
+   
+var lineChart = new Chart(ctx, {
+    type: 'line',
+    data: speedData
+});
 },{"amazon-chime-sdk-js":52}]},{},[202]);

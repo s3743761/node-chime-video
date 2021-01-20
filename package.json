@@ -11,10 +11,14 @@
   "license": "ISC",
   "dependencies": {
     "amazon-chime-sdk-js": "^2.4.0",
+    "atob": "^2.1.2",
     "aws-sdk": "^2.828.0",
     "body-parser": "^1.19.0",
     "browserify": "^17.0.0",
+    "chart.js": "^2.9.4",
+    "chartjs-plugin-streaming": "^1.8.0",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "node-fetch": "^2.6.1",
     "pug": "^3.0.0",
     "uuid": "^8.3.2"
