@@ -29406,10 +29406,22 @@ function capture(video, scaleFactor) {
 }
 
 
-
+let calm_emotion = []
+let snapshots = []
+let emotion_object = {
+    'HAPPY':[],
+    'SAD':[],
+    'CALM':[],
+    'ANGRY':[],
+    'SURPRISED':[],
+    'FEAR':[],
+    'CONFUSED':[],
+    'DISGUSTED':[]
+}
 document.getElementById('screenshot').addEventListener('click', onClickScreenShot);
+var ctx = document.getElementById('myChart').getContext('2d');
 async function onClickScreenShot(event) {
-    let snapshots = [];
+  
     event.preventDefault();
    
     let video =  document.querySelectorAll('[is-local="true"]')[0];
@@ -29426,9 +29438,55 @@ async function onClickScreenShot(event) {
         body: JSON.stringify({emotions: screenshot})
     });
     const data = await response.json();
-    // console.log(data)
+    console.log(data)
     snapshots.push(data)
-    console.log(snapshots[0][0]['Type'])
+    console.log(snapshots)
+    // console.log(snapshots.length)
+    // var i;
+    // for(i = 0; i < 10; i++){
+    //     console.log(snapshots[i][0]);
+    // }
+    // element = {'Type': 'Happy', 'Confidence': 90}
+    data.forEach(element => {
+        // console.log(element)
+        emotion_object[element['Type']].push(element['Confidence'])
+
+    });
+    console.log(emotion_object)
+
+    var dataFirst = {
+        label: "CALM",
+        data: emotion_object['CALM'],
+        lineTension: 0.3,
+        // Set More Options
+        borderColor: 'red'
+    };
+         
+    var dataSecond = {
+    label: "CONFUSED",
+    data: emotion_object['CONFUSED'],
+    // Set More Options
+    borderColor: 'black'
+    };
+    
+    var thirdSecond = {
+        label: "SAD",
+        data: emotion_object['SAD'],
+        // Set More Options
+        borderColor: 'green'
+    };
+    var speedData = {
+        labels: ["0s", "10s", "20s", "30s", "40s", "50s", "60s","70s","80s","90s","100"],
+        datasets: [dataSecond,dataFirst,thirdSecond]
+    };
+       
+    var lineChart = new Chart(ctx, {
+        type: 'line',
+        data: speedData,
+        options: {
+            animation: false
+        }
+    });
     // console.log(configuration)
 
     // SEND TO AWS REKO
@@ -29472,37 +29530,37 @@ async function onClickScreenShot(event) {
     
 //     meetingSession.audioVideo.stop();
 // }
-var ctx = document.getElementById('myChart').getContext('2d');
-var dataFirst = {
-    label: "Car A - Speed (mph)",
-    data: [0, 59, 75, 20, 20, 55, 40],
-    lineTension: 0.3,
-    // Set More Options
-    borderColor: 'red'
-};
-     
-var dataSecond = {
-label: "Car B - Speed (mph)",
-data: [20, 15, 60, 60, 65, 30, 70],
-// Set More Options
-borderColor: 'black'
-};
 
-var thirdSecond = {
-    label: "Car C - Speed (mph)",
-    data: [0,10,25,74,64,65,80],
-    // Set More Options
-    borderColor: 'green'
-};
+// var dataFirst = {
+//     label: "Car A - Speed (mph)",
+//     data: [0, 59, 75, 20, 20, 55, 40],
+//     lineTension: 0.3,
+//     // Set More Options
+//     borderColor: 'red'
+// };
+     
+// var dataSecond = {
+// label: "Car B - Speed (mph)",
+// data: [20, 15, 60, 60, 65, 30, 70],
+// // Set More Options
+// borderColor: 'black'
+// };
+
+// var thirdSecond = {
+//     label: "Car C - Speed (mph)",
+//     data: [0,10,25,74,64,65,80],
+//     // Set More Options
+//     borderColor: 'green'
+// };
     
-var speedData = {
-labels: ["0s", "10s", "20s", "30s", "40s", "50s", "60s"],
-datasets: [dataFirst, dataSecond,thirdSecond]
-};
+// var speedData = {
+// labels: ["0s", "10s", "20s", "30s", "40s", "50s", "60s"],
+// datasets: [dataFirst, dataSecond,thirdSecond]
+// };
    
    
-var lineChart = new Chart(ctx, {
-    type: 'line',
-    data: speedData
-});
+// var lineChart = new Chart(ctx, {
+//     type: 'line',
+//     data: speedData
+// });
 },{"amazon-chime-sdk-js":52}]},{},[202]);
