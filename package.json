@@ -19,8 +19,10 @@
     "chartjs-plugin-streaming": "^1.8.0",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "jwt-decode": "^3.1.2",
     "node-fetch": "^2.6.1",
     "pug": "^3.0.0",
+    "serverless-http": "^2.6.1",
     "uuid": "^8.3.2"
   }
 }
