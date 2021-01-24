@@ -29298,19 +29298,40 @@ const aws = require('amazon-chime-sdk-js');
 
 const logger = new aws.ConsoleLogger('MyLogger', aws.LogLevel.INFO);
 const deviceController = new aws.DefaultDeviceController(logger);
-// let configuration
-// let meetingSession
+let configuration;
+let meetingSession;
+let userType = '';
+const params = new URLSearchParams(window.location.search);
+let id_token = params.get('id');
+
 document.getElementById('submit').addEventListener('click', onClick);
 
+// var timerVar = setInterval(countTimer, 1000);
+var totalSeconds = 0;
+function countTimer() {
+    ++totalSeconds;
+    var hour = Math.floor(totalSeconds /3600);
+    var minute = Math.floor((totalSeconds - hour*3600)/60);
+    var seconds = totalSeconds - (hour*3600 + minute*60);
+    if(hour < 10)
+        hour = "0"+hour;
+    if(minute < 10)
+        minute = "0"+minute;
+    if(seconds < 10)
+        seconds = "0"+seconds;
+    document.getElementById("timer").innerHTML = hour + ":" + minute + ":" + seconds;
+    
+}
 async function onClick(event) {
     event.preventDefault();
     
     const meeting_name = document.getElementById("meeting-name").value;
 
-    const response = await fetch('/meeting',{
+    const response = await fetch('https://j9sgxptxu8.execute-api.us-west-2.amazonaws.com/dev/meeting',{
         method:'POST', 
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': id_token
         },
         body: JSON.stringify({meeting_name: meeting_name})
     });
@@ -29318,21 +29339,22 @@ async function onClick(event) {
     const data = await response.json();
     const meetingResponse = data.meetingResponse;
     const attendeeResponse = data.attendee;
-    // configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
+    userType = data.usertype;
+    configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
 
-    const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
+    // const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
     // In the usage examples below, you will use this meetingSession object.
-    // meetingSession = new aws.DefaultMeetingSession(
-    //     configuration,
-    //     logger,
-    //     deviceController
-    // );
-
-    const meetingSession = new aws.DefaultMeetingSession(
+    meetingSession = new aws.DefaultMeetingSession(
         configuration,
         logger,
         deviceController
     );
+
+    // const meetingSession = new aws.DefaultMeetingSession(
+    //     configuration,
+    //     logger,
+    //     deviceController
+    // );
 
     const audioInputDevices = await meetingSession.audioVideo.listAudioInputDevices();
     const audioOutputDevices = await meetingSession.audioVideo.listAudioOutputDevices();
@@ -29360,7 +29382,11 @@ async function onClick(event) {
             let videoElement = document.getElementById("video-" + tileState.tileId);
             if (!videoElement) {
                 videoElement = document.createElement("video");
-                videoElement.setAttribute("is-local", tileState.localTile);
+               
+                // videoElement.setAttribute("is-local", tileState.localTile);
+                // videoElement.setAttribute("user-type", userType);
+                videoElement.setAttribute("should-screenshot", tileState.localTile == false && userType == "Admin");
+
                 videoElement.id = "video-" + tileState.tileId;
                 document.getElementById("video-list").append(videoElement);
                 meetingSession.audioVideo.bindVideoElement(
@@ -29373,10 +29399,14 @@ async function onClick(event) {
             
         }
     };
-
+   
+    var timerVar = setInterval(countTimer, 1000);
     meetingSession.audioVideo.addObserver(observer);
     meetingSession.audioVideo.startLocalVideoTile();
     meetingSession.audioVideo.start();
+    
+    
+    
 
 }
 
@@ -29405,8 +29435,7 @@ function capture(video, scaleFactor) {
     return canvas;
 }
 
-
-let calm_emotion = []
+let seconds = []
 let snapshots = []
 let emotion_object = {
     'HAPPY':[],
@@ -29418,29 +29447,33 @@ let emotion_object = {
     'CONFUSED':[],
     'DISGUSTED':[]
 }
-document.getElementById('screenshot').addEventListener('click', onClickScreenShot);
+// document.getElementById('screenshot').addEventListener('click', onClickScreenShot);
 var ctx = document.getElementById('myChart').getContext('2d');
 async function onClickScreenShot(event) {
   
-    event.preventDefault();
+    // event.preventDefault();
    
-    let video =  document.querySelectorAll('[is-local="true"]')[0];
+    let video =  document.querySelectorAll('[should-screenshot="true"]')[0];
     let canvas = capture(video, 0.25);
+
 
     let screenshot = canvas.toDataURL('image/png');
     // console.log(screenshot);
 
-    const response = await fetch('/facial',{
+    const response = await fetch('https://j9sgxptxu8.execute-api.us-west-2.amazonaws.com/dev/face-recognition',{
         method:'POST', 
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': id_token
         },
         body: JSON.stringify({emotions: screenshot})
     });
     const data = await response.json();
-    console.log(data)
-    snapshots.push(data)
-    console.log(snapshots)
+    console.log(data);
+    snapshots.push(data);
+    console.log(snapshots);
+    seconds.push(totalSeconds);
+    console.log(seconds);
     // console.log(snapshots.length)
     // var i;
     // for(i = 0; i < 10; i++){
@@ -29454,113 +29487,95 @@ async function onClickScreenShot(event) {
     });
     console.log(emotion_object)
 
-    var dataFirst = {
+    var calm = {
         label: "CALM",
         data: emotion_object['CALM'],
         lineTension: 0.3,
-        // Set More Options
         borderColor: 'red'
     };
          
-    var dataSecond = {
+    var confused = {
     label: "CONFUSED",
     data: emotion_object['CONFUSED'],
-    // Set More Options
     borderColor: 'black'
     };
+
+    var fear = {
+        label: "FEAR",
+        data: emotion_object['FEAR'],
+        borderColor: 'green'
+        };
     
-    var thirdSecond = {
+    var sad = {
         label: "SAD",
         data: emotion_object['SAD'],
-        // Set More Options
-        borderColor: 'green'
+        borderColor: 'yellow'
     };
-    var speedData = {
-        labels: ["0s", "10s", "20s", "30s", "40s", "50s", "60s","70s","80s","90s","100"],
-        datasets: [dataSecond,dataFirst,thirdSecond]
+    var happy = {
+        label: "HAPPY",
+        data: emotion_object['HAPPY'],
+        lineTension: 0.3,
+        borderColor: 'blue'
     };
-       
-    var lineChart = new Chart(ctx, {
-        type: 'line',
-        data: speedData,
-        options: {
-            animation: false
-        }
-    });
-    // console.log(configuration)
-
-    // SEND TO AWS REKO
-
-    // canvas.onClickScreenShot = function() {
-    //     window.open(this.toDataURL(image/jpg));
-        
-    //     console.log("image out",this.toDataURL(image/jpg));
-    // };
+         
+    var angry = {
+    label: "ANGRY",
+    data: emotion_object['ANGRY'],
+    borderColor: 'orange'
+    };
     
-    // snapshots.push(canvas);
-    // output.innerHTML = '';
-    // // for (var i = 0; i < 4; i++) {
-    // //     output.append(snapshots[i]);
-    // // }
-    // snapshots.forEach(element => output.appendChild(element));
+    var surprised = {
+        label: "SURPRISED",
+        data: emotion_object['SURPRISED'],
+        borderColor: 'apricot'
+    };
+
+    var disgusted = {
+        label: "DISGUSTED",
+        data: emotion_object['DISGUSTED'],
+        borderColor: 'brown'
+    };
+    //TODO: change to time
+    var speedData = {
+        labels: seconds,
+        datasets: [calm,happy,sad,angry,surprised,fear,disgusted,confused]
+    };
+    if(userType == 'Admin'){
+        new Chart(ctx, {
+            type: 'line',
+            data: speedData,
+            options: {
+                animation: false
+            }
+        });
+    }
 
 }
 
-// // setInterval(onClickScreenShot,5000)//Runs the "func" function every second
-// document.getElementById('stop').addEventListener('click', stopCall);
-// async function stopCall(event) {
-//     event.preventDefault();
+setInterval(onClickScreenShot,20000)//Runs the "func" function every 30 seconds
+document.getElementById('stop').addEventListener('click', stopCall);
+async function stopCall(event) {
+    event.preventDefault();
 
-//     const observer = {
-//         audioVideoDidStop: sessionStatus => {
-//           const sessionStatusCode = sessionStatus.statusCode();
-//           if (sessionStatusCode === configuration.Left) {
-//             /*
-//               - You called meetingSession.audioVideo.stop().
-//               - When closing a browser window or page, Chime SDK attempts to leave the session.
-//             */
-//             console.log('You left the session');
-//           } else {
-//             console.log('Stopped with a session status code: ', sessionStatusCode);
-//           }
-//         }
-//       };
-      
-//     meetingSession.audioVideo.addObserver(observer);
+    const observer = {
+        audioVideoDidStop: sessionStatus => {
+          const sessionStatusCode = sessionStatus.statusCode();
+          if (sessionStatusCode === configuration.Left) {
+            /*
+              - You called meetingSession.audioVideo.stop().
+              - When closing a browser window or page, Chime SDK attempts to leave the session.
+            */
+            console.log('You left the session');
+          } else {
+            console.log('Stopped with a session status code: ', sessionStatusCode);
+          }
+        }
+      };
     
-//     meetingSession.audioVideo.stop();
-// }
-
-// var dataFirst = {
-//     label: "Car A - Speed (mph)",
-//     data: [0, 59, 75, 20, 20, 55, 40],
-//     lineTension: 0.3,
-//     // Set More Options
-//     borderColor: 'red'
-// };
-     
-// var dataSecond = {
-// label: "Car B - Speed (mph)",
-// data: [20, 15, 60, 60, 65, 30, 70],
-// // Set More Options
-// borderColor: 'black'
-// };
-
-// var thirdSecond = {
-//     label: "Car C - Speed (mph)",
-//     data: [0,10,25,74,64,65,80],
-//     // Set More Options
-//     borderColor: 'green'
-// };
+    meetingSession.audioVideo.addObserver(observer);
     
-// var speedData = {
-// labels: ["0s", "10s", "20s", "30s", "40s", "50s", "60s"],
-// datasets: [dataFirst, dataSecond,thirdSecond]
-// };
-   
-   
-// var lineChart = new Chart(ctx, {
-//     type: 'line',
-//     data: speedData
-// });
+    meetingSession.audioVideo.stop();
+    clearInterval(timerVar);
+}
+
 },{"amazon-chime-sdk-js":52}]},{},[202]);
