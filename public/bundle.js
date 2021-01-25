@@ -29301,8 +29301,12 @@ const deviceController = new aws.DefaultDeviceController(logger);
 let configuration;
 let meetingSession;
 let userType = '';
-const params = new URLSearchParams(window.location.search);
-let id_token = params.get('id');
+// const params = new URLSearchParams(window.location.search);
+// let id_token = params.get('id');
+
+const urlParams = new URLSearchParams(window.location.search);
+const myParam = urlParams.get('id');
+console.log(myParam)
 
 document.getElementById('submit').addEventListener('click', onClick);
 
@@ -29327,17 +29331,22 @@ async function onClick(event) {
     
     const meeting_name = document.getElementById("meeting-name").value;
 
+    // const response = await fetch(' http://localhost:3000/meeting',{
     const response = await fetch('https://j9sgxptxu8.execute-api.us-west-2.amazonaws.com/dev/meeting',{
+     
         method:'POST', 
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': id_token
+            'Authorization': myParam
         },
         body: JSON.stringify({meeting_name: meeting_name})
     });
+    
 
     const data = await response.json();
+    console.log(data)
     const meetingResponse = data.meetingResponse;
+    console.log(meetingResponse)
     const attendeeResponse = data.attendee;
     userType = data.usertype;
     configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
@@ -29350,11 +29359,11 @@ async function onClick(event) {
         deviceController
     );
 
-    // const meetingSession = new aws.DefaultMeetingSession(
-    //     configuration,
-    //     logger,
-    //     deviceController
-    // );
+    // if(userType == ''){
+
+    //     document.write ("Incorrect credentials." );
+    //     return 0;
+    // }
 
     const audioInputDevices = await meetingSession.audioVideo.listAudioInputDevices();
     const audioOutputDevices = await meetingSession.audioVideo.listAudioOutputDevices();
@@ -29464,7 +29473,7 @@ async function onClickScreenShot(event) {
         method:'POST', 
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': id_token
+            'Authorization': myParam
         },
         body: JSON.stringify({emotions: screenshot})
     });
