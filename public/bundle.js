@@ -29301,8 +29301,7 @@ const deviceController = new aws.DefaultDeviceController(logger);
 let configuration;
 let meetingSession;
 let userType = '';
-// const params = new URLSearchParams(window.location.search);
-// let id_token = params.get('id');
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const myParam = urlParams.get('id');
@@ -29352,13 +29351,13 @@ async function onClick(event) {
     userType = data.usertype;
     configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
     if(userType == "Admin"){
-        a.href = "http://127.0.0.1:5000/Adminhome";
+        a.href = "http://34.210.141.94:5000/Adminhome";
     }
     else if(userType == "Normal"){
-        a.href = "http://127.0.0.1:5000/Userhome";
+        a.href = "http://34.210.141.94:5000/Userhome";
     }
     else{
-        a.href = "http://127.0.0.1:5000/#";
+        a.href = "http://34.210.141.94:5000/#";
     }
     // const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
     // In the usage examples below, you will use this meetingSession object.
@@ -29400,7 +29399,9 @@ async function onClick(event) {
             let videoElement = document.getElementById("video-" + tileState.tileId);
             if (!videoElement) {
                 videoElement = document.createElement("video");
-                videoElement.style.width ="100px";
+                videoElement.style.width ="800px";
+                videoElement.style.border ="thick solid #ffffff";
+                
                
                 // videoElement.setAttribute("is-local", tileState.localTile);
                 // videoElement.setAttribute("user-type", userType);
@@ -29569,13 +29570,13 @@ async function onClickScreenShot(event) {
         });
     }
     if(userType == "Admin"){
-        a.href = "http://127.0.0.1:5000/Adminhome";
+        a.href = "http://34.210.141.94:5000/Adminhome";
     }
     else if(userType == "Normal"){
-        a.href = "http://127.0.0.1:5000/Userhome";
+        a.href = "http://34.210.141.94:5000/Userhome";
     }
     else{
-        a.href = "http://127.0.0.1:5000/#";
+        a.href = "http://34.210.141.94:5000/#";
     }
 
 }
@@ -29600,13 +29601,13 @@ async function stopCall(event) {
         }
       };
     if(userType == "Admin"){
-        a.href = "http://127.0.0.1:5000/Adminhome";
+        a.href = "http://34.210.141.94:5000/Adminhome";
     }
     else if(userType == "Normal"){
-        a.href = "http://127.0.0.1:5000/Userhome";
+        a.href = "http://34.210.141.94:5000/Userhome";
     }
     else{
-        a.href = "http://127.0.0.1:5000/#";
+        a.href = "http://34.210.141.94:5000/#";
     }
     meetingSession.audioVideo.addObserver(observer);
     
