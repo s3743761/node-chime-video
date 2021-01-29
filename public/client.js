@@ -7,14 +7,14 @@ const deviceController = new aws.DefaultDeviceController(logger);
 let configuration;
 let meetingSession;
 let userType = '';
-// const params = new URLSearchParams(window.location.search);
-// let id_token = params.get('id');
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const myParam = urlParams.get('id');
 console.log(myParam)
-
+var a = document.getElementById('link'); 
 document.getElementById('submit').addEventListener('click', onClick);
+
 
 // var timerVar = setInterval(countTimer, 1000);
 var totalSeconds = 0;
@@ -56,7 +56,15 @@ async function onClick(event) {
     const attendeeResponse = data.attendee;
     userType = data.usertype;
     configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
-
+    if(userType == "Admin"){
+        a.href = "http://127.0.0.1:5000/Adminhome";
+    }
+    else if(userType == "Normal"){
+        a.href = "http://127.0.0.1:5000/Userhome";
+    }
+    else{
+        a.href = "http://127.0.0.1:5000/#";
+    }
     // const configuration = new aws.MeetingSessionConfiguration(meetingResponse, attendeeResponse);
     // In the usage examples below, you will use this meetingSession object.
     meetingSession = new aws.DefaultMeetingSession(
@@ -97,6 +105,9 @@ async function onClick(event) {
             let videoElement = document.getElementById("video-" + tileState.tileId);
             if (!videoElement) {
                 videoElement = document.createElement("video");
+                videoElement.style.width ="800px";
+                videoElement.style.border ="thick solid #ffffff";
+                
                
                 // videoElement.setAttribute("is-local", tileState.localTile);
                 // videoElement.setAttribute("user-type", userType);
@@ -264,6 +275,15 @@ async function onClickScreenShot(event) {
             }
         });
     }
+    if(userType == "Admin"){
+        a.href = "http://127.0.0.1:5000/Adminhome";
+    }
+    else if(userType == "Normal"){
+        a.href = "http://127.0.0.1:5000/Userhome";
+    }
+    else{
+        a.href = "http://127.0.0.1:5000/#";
+    }
 
 }
 
@@ -286,9 +306,20 @@ async function stopCall(event) {
           }
         }
       };
-    
+    if(userType == "Admin"){
+        a.href = "http://127.0.0.1:5000/Adminhome";
+    }
+    else if(userType == "Normal"){
+        a.href = "http://127.0.0.1:5000/Userhome";
+    }
+    else{
+        a.href = "http://127.0.0.1:5000/#";
+    }
     meetingSession.audioVideo.addObserver(observer);
     
     meetingSession.audioVideo.stop();
     clearInterval(timerVar);
 }
+
+// console.log(a)
+// console.log(userType)
